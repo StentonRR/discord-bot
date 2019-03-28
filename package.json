@@ -1,0 +1,26 @@
+{
+  "name": "Yuko",
+  "version": "1.0.0",
+  "description": "Discord Bot",
+  "main": "Yuko.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rune",
+  "dependencies": {
+
+
+
+
+    
+  },
+  "devDependencies": {},
+  "keywords": [
+    "discord",
+    "bot",
+    "yuko",
+    "roles"
+  ],
+  "license": "UNLICENSED",
+  "private": true
+}
