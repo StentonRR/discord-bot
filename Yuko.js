@@ -30,7 +30,7 @@ bot.on("ready", () => {
 
 
 	// const music = new Music(bot, {
-	// 	youtubeKey: ' AIzaSyD0_W-cAYnjvNi13WqFiTQB8vBd4papcFE ',
+	// 	youtubeKey: ' ',
 	// 	prefix: auth.prefix,       // Prefix for the commands.
 	// 	global: false,         // Non-server-specific queues.
 	// 	maxQueueSize: 25,     // Maximum queue size of 25.
