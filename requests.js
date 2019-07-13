@@ -1,5 +1,5 @@
 const test = require("./testingMethods.js");
-const auth = require("./auth.json");
+const Yuko = require("./Yuko.js");
 const fetch = require("node-fetch");
 
 
@@ -12,7 +12,7 @@ module.exports = {
       let username = urlPieces[urlPieces.length - 1];
 
       let response = await fetch(`https://api.twitch.tv/helix/streams?user_login=${username}`
-                                  , {method: 'GET', headers: {"Client-ID": auth.twitchId}} );
+                                  , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitchId}} );
 
       let streamInfo = await response.json();
 
@@ -27,7 +27,7 @@ module.exports = {
 
     getGame: async (gameId) => {
       let response = await fetch(`https://api.twitch.tv/helix/games?id=${gameId}`
-                                , {method: 'GET', headers: {"Client-ID": auth.twitchId}} );
+                                , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitchId}} );
 
       let gameInfo = await response.json();
 
@@ -40,7 +40,7 @@ module.exports = {
       let username = urlPieces[urlPieces.length - 1];
 
       let response = await fetch(`https://api.twitch.tv/helix/users?login=${username}`
-                                  , {method: 'GET', headers: {"Client-ID": auth.twitchId}} );
+                                  , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitchId}} );
 
       let userInfo = await response.json();
 

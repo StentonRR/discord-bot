@@ -1,22 +1,21 @@
-const toggleOption = require("./toggleOption.js");
-const jsonMan = require("./jsonMan.js");
-const auth = require("./auth.json");
-const test = require("./testingMethods.js");
+const Yuko = require("../Yuko.js");
+const toggleOption = require("../toggleOption.js");
+const jsonMan = require("../jsonMan.js");
+const test = require("../testingMethods.js");
 const util = require('util');
-const imaging = require('./imaging.js');
-const dataProvider = require('./dataProvider.js');
+const imaging = require('../imaging.js');
+const dataProvider = require('../dataProvider.js');
 const fs = require('fs');
 
-const commands = require('./command.js');
+const commands = require('../command.js');
 
 module.exports = {
 
  command: function(message){
 
-
    try{
 			let command = message.content.split(" ")[0];
-			command = command.slice(auth.prefix.length)
+			command = command.slice(Yuko.settings.prefix.length)
 
 			let args = message.content.split(" ").slice(1);
 
@@ -41,9 +40,9 @@ module.exports = {
       let data = await dataProvider.custom(`SELECT welcomerbool, welcomerchannel FROM servers WHERE id = '${guild.id}'`);
 
       if(data.rows[0].welcomerbool){
-          auth.bot.guilds.get(guild.id).owner.user.send(`${member.user.username} has joined ${guild.name}!`);
+          Yuko.bot.guilds.get(guild.id).owner.user.send(`${member.user.username} has joined ${guild.name}!`);
 
-          return auth.bot.guilds.get(guild.id).channels.find(x => x.name === data.rows[0].welcomerchannel).send(`Welcome ${member.toString()} to this server.
+          return Yuko.bot.guilds.get(guild.id).channels.get(data.rows[0].welcomerchannel).send(`Welcome ${member.toString()} to this server.
                  Remember everything isn't as it seems and many here are prone to flights of fancy.`);
       }
 
@@ -74,7 +73,7 @@ module.exports = {
       for(let row of bdayData.rows){
 
         if(info[row.guild].bdaybool){
-          auth.bot.guilds.get(row.guild).channels.find(x => x.name === info[row.guild].bdaychannel).send(`:confetti_ball: :confetti_ball:@here LETS ALL WISH ${auth.bot.guilds.get(row.guild).members.get(row.id).toString()} A HAPPY BIRTHDAY!!!!:confetti_ball: :confetti_ball: `, {
+          Yuko.bot.guilds.get(row.guild).channels.get(info[row.guild].bdaychannel).send(`:confetti_ball: :confetti_ball:@here LETS ALL WISH ${Yuko.bot.guilds.get(row.guild).members.get(row.id).toString()} A HAPPY BIRTHDAY!!!!:confetti_ball: :confetti_ball: `, {
                                    files: ["./pics/birthday.png"]
                                  });
         }

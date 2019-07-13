@@ -13,50 +13,40 @@ module.exports = {
     if(requests.twitch.isTwitch(member.presence.game.url)){
 
       setTimeout( async() => {
-
         let streamInfo = await requests.twitch.getStream(member.presence.game.url);
         let userInfo = await requests.twitch.getUser(member.presence.game.url);
 
         if(streamInfo.data.length == 0){
-          test.log('Set timeout');
-          streamInfo = await requests.twitch.getStream(member.presence.game.url)
+          let streamEmbed = new Discord.RichEmbed()
+              .setColor('#981111')
+              .setAuthor(member.user.username, member.user.avatarURL)
+              .addField(`Check out ${member.user.username}'s stream!`, member.presence.game.url)
+              .setImage(member.user.avatarURL);
+
+          member.guild.channels.get(streamChannel).send(streamEmbed);
+        }else{
+
+          let gameInfo = await requests.twitch.getGame(streamInfo.data[0].game_id);
+
+          let streamEmbed = new Discord.RichEmbed()
+              .setColor('#981111')
+              .setAuthor(member.user.username, member.user.avatarURL)
+              .addField(streamInfo.data[0].title, member.presence.game.url)
+              .setImage(userInfo.data[0].profile_image_url)
+              .setThumbnail(gameInfo.data[0].box_art_url.replace("{width}x{height}", "1000x1300"));
+
+          member.guild.channels.get(streamChannel).send(streamEmbed);
         }
-
-          if(streamInfo.data.length == 0){
-            let streamEmbed = new Discord.RichEmbed()
-                .setColor('#981111')
-                .setAuthor(member.user.username, member.user.avatarURL)
-                .addField(`Checkout ${member.user.username}'s stream!`, member.presence.game.url)
-                .setImage(member.user.avatarURL);
-
-            test.embed(streamEmbed);
-          }else{
-
-            let gameInfo = await requests.twitch.getGame(streamInfo.data[0].game_id);
-
-            let streamEmbed = new Discord.RichEmbed()
-                .setColor('#981111')
-                .setAuthor(member.user.username, member.user.avatarURL)
-                .addField(streamInfo.data[0].title, member.presence.game.url)
-                .setImage(userInfo.data[0].profile_image_url)
-                .setThumbnail(gameInfo.data[0].box_art_url.replace("{width}x{height}", "1000x1300"));
-
-            test.log(`Art: ${gameInfo.data[0].box_art_url}`);
-
-            test.embed(streamEmbed);
-          }
-        }, 60000);
+      }, 60000);
     }else{
       test.log('Non-twitch stream detected');
     }
   },
 
 
-
   removeStream: async (member) => {
-    test.log(`${member.user.username} stopped streaming in ${member.guild.name}`);
+    //test.log(`${member.user.username} stopped streaming in ${member.guild.name}`);
   },
-
 
 
   streamStatus: async (member) => {
@@ -74,7 +64,6 @@ module.exports = {
   },
 
 
-
   streamPresence: async function(newMember, oldMember){
     let result =  [false, ''];
     let status = await module.exports.streamStatus(newMember);
@@ -90,25 +79,6 @@ module.exports = {
       }
 
     }else if((oldMember.presence.game && oldMember.presence.game.streaming) && (!newMember.presence.game || !newMember.presence.game.streaming) && status){
-
-      // // Check if it is twitch stream link
-      // if(requests.twitch.isTwitch(oldMember.presence.game.url)){
-      //   let streamInfo = await requests.twitch.getStream(oldMember.presence.game.url);
-      //
-      //   // Ensure twitch stream is off
-      //   if(!streamInfo.data[0]){
-      //     result[0] = true;
-      //     result[1] = 'Stop Stream';
-      //
-      //     //log stream end in db
-      //     let data = await dataProvider.custom(`UPDATE stream_t SET status = ${false} WHERE id = '${newMember.id}' AND guild = '${newMember.guild.id}'`);
-      //     if(data.rowCount == 0){
-      //       dataProvider.custom(`INSERT INTO stream_t VALUES ('${newMember.id}', '${newMember.guild.id}', ${false})`);
-      //     }
-      //
-      //   }
-
-    //  }else{
         result[0] = true;
         result[1] = 'Stop Stream';
 
@@ -117,12 +87,11 @@ module.exports = {
         if(data.rowCount == 0){
           dataProvider.custom(`INSERT INTO stream_t VALUES ('${newMember.id}', '${newMember.guild.id}', ${false})`);
         }
-
-    //  }
     }
 
     return result;
   },
+
 
   streamPresenceTest: async function(newMember, oldMember){
     let result =  [false, ''];
@@ -133,25 +102,12 @@ module.exports = {
       result[1] = 'Start Stream';
 
     }else if((oldMember.presence.game && oldMember.presence.game.streaming) && (!newMember.presence.game || !newMember.presence.game.streaming) && status){
-
-      // // Check if it is twitch stream link
-      // if(requests.twitch.isTwitch(oldMember.presence.game.url)){
-      //   let streamInfo = await requests.twitch.getStream(oldMember.presence.game.url);
-      //   test.log(JSON.stringify(streamInfo));
-      //   // Ensure twitch stream is off
-      //   if(!streamInfo.data[0]){
-      //     test.log('here2');
-      //     result[0] = true;
-      //     result[1] = 'Stop Stream';
-      //   }
-
-//      }else{
         result[0] = true;
         result[1] = 'Stop Stream';
-//      }
     }
     return result;
     },
+
 
   gamePresence: function(member, oldMember){
 

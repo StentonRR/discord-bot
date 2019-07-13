@@ -1,10 +1,10 @@
 const Discord = require('discord.js');
 const toggleOption = require("./toggleOption.js");
-const presenceController = require('./presenceController.js');
-const commandController = require('./commandController.js');
+const presenceController = require('./controllers/presenceController.js');
+const commandController = require('./controllers/commandController.js');
 const presence = require('./presence.js');
 const jsonMan = require("./jsonMan.js");
-const auth = require("./auth.json");
+const Yuko = require("./Yuko.js");
 const authorization = require("./authorization.js");
 const test = require("./testingMethods.js");
 const testObjects = require("./testObjects.js");
@@ -14,8 +14,6 @@ const dataProvider = require('./dataProvider.js');
 const fs = require('fs');
 const requests = require('./requests.js');
 const fetch = require("node-fetch");
-
-var servers =  jsonMan.read("./servers.json");
 
 module.exports = {
 
@@ -70,7 +68,7 @@ module.exports = {
         let result = `\n`;
 
         for(let row of data.rows){
-          result += `${auth.bot.guilds.get(guild.id).members.get(row.id).user.username}'s birthday is ${row.bdaydate.getMonth() + 1}/${row.bdaydate.getDate()}\n`;
+          result += `${Yuko.bot.guilds.get(guild.id).members.get(row.id).user.username}'s birthday is ${row.bdaydate.getMonth() + 1}/${row.bdaydate.getDate()}\n`;
         }
 
         message.reply(result);
@@ -118,21 +116,21 @@ module.exports = {
   setBdays: {
         description: "Enables birthday notification",
         usage: "y/setBdays <text channel name>",
-        authorization: (id, guild, lvl='owner') => {
+        authorization: (id, guild, lvl='moderator') => {
           return authorization.authorize(id, guild, lvl);
         },
-        requirement: (args) => {
-          return args.length == 1;
+        requirement: (args, msg) => {
+          return msg.guild.channels.find(x => x.name === args[0]) ? true : false;
         },
         function: (message, args, guild, id) => {
-          toggleOption.toggleOption("bday", true, message, args[0]);
+          toggleOption.toggleOption("bday", true, message, guild.channels.find(x => x.name === args[0]).id);
         }
   },
 
   bdaysOff: {
       description: "Disable birthday notification",
       usage: "y/bdaysOff",
-      authorization: (id, guild, lvl='owner') => {
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
       requirement: (args) => {
@@ -147,21 +145,21 @@ module.exports = {
   setStreamLinks: {
       description: "Enable streaming notifications",
       usage: "y/setStreamLinks <text channel name>",
-      authorization: (id, guild, lvl='owner') => {
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
-      requirement: (args) => {
-        return args.length == 1;
+      requirement: (args, msg) => {
+        return msg.guild.channels.find(x => x.name === args[0]) ? true : false;
       },
       function: (message, args, guild, id) => {
-        toggleOption.toggleOption("streamlink", true, message, args[0]);
+        toggleOption.toggleOption("streamlink", true, message, guild.channels.find(x => x.name === args[0]).id);
       }
   },
 
   streamLinksOff:  {
       description: "Disable streaming notifications",
       usage: "y/streamLinksOff",
-      authorization: (id, guild, lvl='owner') => {
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
       requirement: (args) => {
@@ -175,21 +173,21 @@ module.exports = {
   setWelcomer: {
       description: "Enable welcome notifications",
       usage: "y/setWelcomer <text channel name>",
-      authorization: (id, guild, lvl='owner') => {
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
-      requirement: (args) => {
-        return args.length == 1;
+      requirement: (args, msg) => {
+        return msg.guild.channels.find(x => x.name === args[0]) ? true : false;;
       },
       function: (message, args, guild, id) => {
-        toggleOption.toggleOption("welcomer", true, message, args[0]);
+        toggleOption.toggleOption("welcomer", true, message, guild.channels.find(x => x.name === args[0]).id);
       }
   },
 
   welcomerOff: {
       description: "Disable welcome notifications",
       usage: "y/welcomerOff",
-      authorization: (id, guild, lvl='owner') => {
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
       requirement: (args) => {
@@ -217,36 +215,13 @@ module.exports = {
         }
 
         let embed = new Discord.RichEmbed()
-            .setColor(auth.msgColor)
-            .setAuthor('Commands', auth.bot.user.avatarURL)
+            .setColor(Yuko.settings.msgColor)
+            .setAuthor('Commands', Yuko.bot.user.avatarURL)
             .setDescription(commandList);
 
         message.reply({embed});
     }
 },
-
-  bunStream:  {
-      description: "Send bun notifications",
-      usage: "y/bunstream",
-      authorization: (id, guild, lvl='rune') => {
-        return authorization.authorize(id, guild, lvl);
-      },
-      requirement: (args) => {
-        return true;
-      },
-      function:(message, args, guild, id) => {
-        let obj = jsonMan.read("servers.json");
-
-
-        for(var server in obj){
-          try{
-            if(obj[server]["streamlink"][1] === ""){continue;}
-              auth.bot.guilds.get(server).channels.find(x => x.name === obj[server]["streamlink"][1]).send(`We got a piping hot, streaming bun fresh from the oven! https://www.twitch.tv/strawberrysweetbun`);
-              //auth.bot.guilds.get("341746752409567242").channels.find("name", "dasf").send(" WE GOT A STREAMER: https://www.twitch.tv/strawberrysweetbun");
-          }catch(err){console.log(err);}
-        }
-      }
-  },
 
   checkbday: {
       description: "Check next birthday",
@@ -259,15 +234,15 @@ module.exports = {
       },
       function: async(message, args, guild, id) => {
         if(!args[0]) args[0] = message.author.id;
-        if(!auth.bot.guilds.get(guild.id).members.get(args[0])) return message.reply('No such user exists in this server~');
+        if(!Yuko.bot.guilds.get(guild.id).members.get(args[0])) return message.reply('No such user exists in this server~');
 
         try{
           let data = await dataProvider.custom(`SELECT bdaydate FROM bday WHERE id = '${args[0]}' AND guild = '${guild.id}'`);
 
           if(data.rows[0]){
-            message.reply(`${auth.bot.guilds.get(guild.id).members.get(args[0]).user.username}'s birthday is ${data.rows[0].bdaydate.getMonth() + 1}/${data.rows[0].bdaydate.getDate()}`);
+            message.reply(`${Yuko.bot.guilds.get(guild.id).members.get(args[0]).user.username}'s birthday is ${data.rows[0].bdaydate.getMonth() + 1}/${data.rows[0].bdaydate.getDate()}`);
           }else{
-            message.reply(`${auth.bot.guilds.get(guild.id).members.get(args[0]).user.username}'s birthday is not recorded`);
+            message.reply(`${Yuko.bot.guilds.get(guild.id).members.get(args[0]).user.username}'s birthday is not recorded`);
           }
         }catch(err){console.log(err)}
 
@@ -304,7 +279,7 @@ module.exports = {
           for(let row of bdayData.rows){
 
             if(info[row.guild].bdaybool){
-              auth.bot.guilds.get(row.guild).channels.find(x => x.name === info[row.guild].bdaychannel).send(`:confetti_ball: :confetti_ball:@here LETS ALL WISH ${auth.bot.guilds.get(row.guild).members.get(row.id).toString()} A HAPPY BIRTHDAY!!!!:confetti_ball: :confetti_ball: `, {
+              Yuko.bot.guilds.get(row.guild).channels.find(x => x.name === info[row.guild].bdaychannel).send(`:confetti_ball: :confetti_ball:@here LETS ALL WISH ${Yuko.bot.guilds.get(row.guild).members.get(row.id).toString()} A HAPPY BIRTHDAY!!!!:confetti_ball: :confetti_ball: `, {
                                        files: ["./pics/birthday.png"]
                                      });
             }
@@ -343,7 +318,7 @@ module.exports = {
         dataProvider.custom(`SELECT id FROM servers`).then((serverIds) =>{
           let servers = '\n'
           for(let index of Object.keys(serverIds.rows)){
-            servers += `${auth.bot.guilds.get(serverIds.rows[index].id).name}\n`;
+            servers += `${Yuko.bot.guilds.get(serverIds.rows[index].id).name}\n`;
           }
           message.reply(servers);
         });
@@ -362,17 +337,16 @@ module.exports = {
       function: async (message, args, guild, id) => {
 
         let streams = await dataProvider.custom(`SELECT id, guild FROM stream_t WHERE status = true`);
-        let guilds = await dataProvider.custom(`SELECT name FROM servers`);
+        let guilds = await dataProvider.custom(`SELECT id FROM servers`);
 
         let result = {};
 
-        for(let guildName of guilds.rows){
-            result[guildName.name] = [];
+        for(let g of guilds.rows){
+            result[Yuko.bot.guilds.get(g.id).name] = [];
         }
 
         for(let user of streams.rows){
-
-          guildTmp =auth.bot.guilds.get(user.guild);
+          guildTmp = Yuko.bot.guilds.get(user.guild);
           memberTmp = guildTmp.members.get(user.id);
 
           result[guildTmp.name].push(memberTmp.user.username)
@@ -407,7 +381,7 @@ module.exports = {
   settings: {
       description: "Display settings for server",
       usage: "y/settings",
-      authorization: (id, guild, lvl='owner') => {
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
       requirement: (args) => {
@@ -417,13 +391,13 @@ module.exports = {
         let ns = "not Set";
 
         dataProvider.retrieve("servers", "id", guild.id).then(function(result){
-          let settingList = `\n**Stream Notification**: ${result.rows[0].streamlinkbool}, ${result.rows[0].streamlinkbool ? result.rows[0].streamlinkchannel : ns}
+          let settingList = `\n**Stream Notification**: ${result.rows[0].streamlinkbool}, ${result.rows[0].streamlinkbool ? guild.channels.get(result.rows[0].streamlinkchannel).name : ns}
                              **Stream Role Manipulation**: ${result.rows[0].streamrolebool}
-                             **Welcomer**: ${result.rows[0].welcomerbool}, ${result.rows[0].welcomerbool ? result.rows[0].welcomerchannel : ns}
-                             **Birthdays**: ${result.rows[0].bdaybool}, ${result.rows[0].bdaybool ? result.rows[0].bdaychannel : ns}`;
+                             **Welcomer**: ${result.rows[0].welcomerbool}, ${result.rows[0].welcomerbool ? guild.channels.get(result.rows[0].welcomerchannel).name : ns}
+                             **Birthdays**: ${result.rows[0].bdaybool}, ${result.rows[0].bdaybool ? guild.channels.get(result.rows[0].bdaychannel).name : ns}`;
           let embed = new Discord.RichEmbed()
-              .setColor(auth.msgColor)
-              .setAuthor('Settings', auth.bot.user.avatarURL)
+              .setColor(Yuko.settings.msgColor)
+              .setAuthor('Settings', Yuko.bot.user.avatarURL)
               .setDescription(settingList);
 
           message.reply({embed});
@@ -442,13 +416,12 @@ module.exports = {
         return true;
       },
       function: async (message, args, guild, id) => {
-        await dataProvider.custom(`UPDATE stream_t SET status = false WHERE status = true`);
-        // let newMember = testObjects.oldMemberGame;
-        // let oldMember = testObjects.newMember;
-        //
-        // let result = await presence.streamPresenceTest(newMember, oldMember);
-        //
-        // test.log(JSON.stringify(result));
+
+        let c = await dataProvider.custom({name: 'create-role', text: `INSERT INTO role_T VALUES ($1, $2, $3)`, values: [`365236513627176962`, `Rainbow Six Siege`, `440981241932677121`] });
+
+
+
+
       }
   },
 
@@ -526,7 +499,7 @@ module.exports = {
         return true;
       },
       function: (message, args, guild, id) => {
-        auth.bot.guilds.get(args[0]).members.get(args[1]).addRole(auth.bot.guilds.get(args[0]).roles.find(x => x.name === "Streaming"));
+        Yuko.bot.guilds.get(args[0]).members.get(args[1]).addRole(Yuko.bot.guilds.get(args[0]).roles.find(x => x.name === "Streaming"));
       }
   },
 
@@ -540,151 +513,87 @@ module.exports = {
         return true;
       },
       function: (message, args, guild, id) => {
-        auth.bot.guilds.get(args[0]).members.get(args[1]).removeRole(auth.bot.guilds.get(args[0]).roles.find(x => x.name === "Streaming"));
-      }
-  },
-
-  streamersTest: {
-      description: "Test streaming notifications",
-      usage: "y/streamersTest",
-      authorization: (id, guild, lvl='rune') => {
-        return authorization.authorize(id, guild, lvl);
-      },
-      requirement: (args) => {
-        return true;
-      },
-      function: (message, args, guild, id) => {
-        let person = args[0];
-        let streamers = jsonMan.read("streamers.json");
-        let un = auth.bot.guilds.get("164248081624334337").members.get(person).user.username;
-
-        if(Object.keys(streamers).length === 0){
-          streamers[un] = person;
-        }else{
-
-        for(var guy in streamers){
-          if(streamers[guy] === person){
-            return;
-          } else {
-            streamers[un] = person;
-          }
-        }
-      }
-
-        jsonMan.write("streamers.json", streamers);
-      }
-  },
-
-  roleLists: {
-      description: "Display role list for server",
-      usage: "y/roleLists",
-      authorization: (id, guild, lvl='rune') => {
-        return authorization.authorize(id, guild, lvl);
-      },
-      requirement: (args) => {
-        return true;
-      },
-      function: (message, args, guild, id) => {
-        message.reply(presenceController.getRoleLists());
-      }
-  },
-
-  testRemove: {
-      description: "Test streamer removal",
-      usage: "y/testRemove",
-      authorization: (id, guild, lvl='rune') => {
-        return authorization.authorize(id, guild, lvl);
-      },
-      requirement: (args) => {
-        return true;
-      },
-      function: (message, args, guild, id) => {
-        removeStream(auth.bot.guilds.get("164248081624334337").members.get(args[1]).user);
-        auth.bot.guilds.get(args[0]).members.get(args[1]).removeRole(auth.bot.guilds.get(args[0]).roles.find(x => x.name === "Streaming"));
-      }
-  },
-
-  bot: {
-      description: "Display bot type",
-      usage: "y/bot",
-      authorization: (id, guild, lvl='rune') => {
-        return authorization.authorize(id, guild, lvl);
-      },
-      requirement: (args) => {
-        return true;
-      },
-      function: (message, args, guild, id) => {
-        message.reply(typeof auth.bot);
+        Yuko.bot.guilds.get(args[0]).members.get(args[1]).removeRole(Yuko.bot.guilds.get(args[0]).roles.find(x => x.name === "Streaming"));
       }
   },
 
   addRole: {
       description: "Add a role to server",
-      usage: "y/addRole <application name>",
-      authorization: (id, guild, lvl='owner') => {
+      usage: "y/addRole <role name>:<regular expression>",
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
-      requirement: (args) => {
-        return true;
+      requirement: (args, msg) => {
+        args = jsonMan.stringConverter(args).split(':');
+        return Yuko.bot.guilds.get(msg.guild.id).roles.find(x => x.name === args[0]) ? true : false;
       },
-      function: (message, args, guild, id) => {
-        let role = jsonMan.stringConverter(args);
-        dataProvider.custom({name: 'fetch-role', text: `SELECT role FROM role_t WHERE id = $1 AND role = $2`, values: [`${guild.id}`, `${role}`] }).then((serverRoles) =>{
-          if(serverRoles.rowCount != 0) {
-            message.reply('Role is already exists');
-          }else{
-            dataProvider.custom({name: 'create-role', text: `INSERT INTO role_T VALUES ($1, $2)`, values: [`${guild.id}`, `${role}`] }).then(() =>{
-              message.reply(`${role} added to roles`);
-            });
-          }
-        });
+      function: async(message, args, guild, id) => {
+        args = jsonMan.stringConverter(args).split(':');
+        let role = Yuko.bot.guilds.get(message.guild.id).roles.find(x => x.name === args[0]);
+
+        let r = await dataProvider.custom(`SELECT * FROM role_t WHERE id = '${guild.id}' AND roleid = '${role.id}'`);
+
+        if(r.rowCount != 0){
+          let s = await dataProvider.custom({name: 'update-role', text: `UPDATE role_T SET regex = $1 WHERE id = $2 AND roleid = $3`, values: [`${args[1]}`, `${guild.id}`, `${role.id}`] });
+          message.reply(`${role.name} updated`);
+        }else{
+          let c = await dataProvider.custom({name: 'create-role', text: `INSERT INTO role_T VALUES ($1, $2, $3)`, values: [`${guild.id}`, `${args[1]}`, `${role.id}`] });
+          message.reply(`${role.name} rule added`);
+        }
+
       }
   },
 
   removeRole: {
       description: "Remove a role from server",
-      usage: "y/removeRole <application name>",
-      authorization: (id, guild, lvl='owner') => {
+      usage: "y/removeRole <role name>",
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
-      requirement: (args) => {
-        return true;
+      requirement: (args, msg) => {
+        args = jsonMan.stringConverter(args);
+        return Yuko.bot.guilds.get(msg.guild.id).roles.find(x => x.name === args) ? true : false;
       },
-      function: (message, args, guild, id) => {
-        let role = jsonMan.stringConverter(args);
-        dataProvider.custom({name: 'fetch-role', text: `SELECT role FROM role_t WHERE id = $1 AND role = $2`, values: [`${guild.id}`, `${role}`] }).then((serverRoles) =>{
-          if(serverRoles.rowCount == 0) {
-            message.reply('No such role exists');
-          }else{
-            dataProvider.custom({name: 'create-role', text: `DELETE FROM role_T WHERE id = $1 AND role = $2`, values: [`${guild.id}`, `${role}`] }).then(() =>{
-              message.reply(`${role} removed from roles`);
-            });
-          }
-        });
+      function: async(message, args, guild, id) => {
+        let role = Yuko.bot.guilds.get(message.guild.id).roles.find(x => x.name === jsonMan.stringConverter(args));
+
+        let r =  await dataProvider.custom(`SELECT * FROM role_t WHERE id = '${guild.id}' AND roleid = '${role.id}'`);
+
+        if(r.rowCount == 0){
+          message.reply(`${role.name} has no rule associated with it`);
+        }else{
+          let c = await dataProvider.custom({name: 'delete-role', text: `DELETE FROM role_T WHERE id = $1 AND roleid = $2`, values: [`${guild.id}`, `${role.id}`] });
+          message.reply(`Rule removed from ${role.name} role`);
+        }
       }
   },
 
   showRoles: {
       description: "Show server roles",
       usage: "y/showRoles",
-      authorization: (id, guild, lvl='owner') => {
+      authorization: (id, guild, lvl='moderator') => {
         return authorization.authorize(id, guild, lvl);
       },
       requirement: (args) => {
         return true;
       },
-      function: (message, args, guild, id) => {
-        dataProvider.custom({name: 'check-role', text: `SELECT role FROM role_t WHERE id = $1`, values: [`${guild.id}`] }).then((serverRoles) =>{
-          if(serverRoles.rowCount == 0) {
-            message.reply('No roles exist for this server');
-          }else{
-            let roles = '\n';
-            for(let index of Object.keys(serverRoles.rows)){
-              roles += `${serverRoles.rows[index].role}\n`;
-            }
-            message.reply(roles);
+      function: async(message, args, guild, id) => {
+        let r = await dataProvider.custom({name: 'fetch-all-role', text: `SELECT * FROM role_t WHERE id = $1`, values: [`${guild.id}`] });
+
+        if(r.rowCount == 0){
+          message.reply('No role rules exist for this server');
+        }else{
+          let n = `\n`;
+
+          let role;
+          for(let rule of r.rows){
+          role = Yuko.bot.guilds.get(message.guild.id).roles.get(rule.roleid);
+          n += `${role.name}: ${rule.regex}\n`;
           }
-        });
+
+          message.reply(n);
+        }
+
       }
   },
 
@@ -702,9 +611,9 @@ module.exports = {
         let data = await dataProvider.custom(`SELECT welcomerbool, welcomerchannel FROM servers WHERE id = '${guild.id}'`);
 
         if(data.rows[0].welcomerbool){
-            auth.bot.guilds.get(guild.id).owner.user.send(`${message.author.username} has joined ${guild.name}!`);
+            Yuko.bot.guilds.get(guild.id).owner.user.send(`${message.author.username} has joined ${guild.name}!`);
 
-            return auth.bot.guilds.get(guild.id).channels.find(x => x.name === data.rows[0].welcomerchannel).send(`Welcome ${message.author.toString()} to this server.
+            return Yuko.bot.guilds.get(guild.id).channels.get(data.rows[0].welcomerchannel).send(`Welcome ${message.author.toString()} to this server.
                    Remember everything isn't as it seems and many here are prone to flights of fancy.`);
         }
       }
@@ -726,7 +635,7 @@ module.exports = {
 
         gameObj.game.name = title;
 
-        return auth.bot.user.setPresence(gameObj);
+        return Yuko.bot.user.setPresence(gameObj);
       }
     },
 
@@ -741,7 +650,7 @@ module.exports = {
       },
       function: (message, args, guild, id) => {
         try{
-          dataProvider.custom(`INSERT INTO servers (id, name) VALUES ('${auth.bot.guilds.get(args[0]).id}', '${auth.bot.guilds.get(args[0]).name}')`);
+          dataProvider.custom(`INSERT INTO servers (id, name) VALUES ('${Yuko.bot.guilds.get(args[0]).id}', '${Yuko.bot.guilds.get(args[0]).name}')`);
           test.log(`New guild added : ${guild.name}, owned by ${guild.owner.user.username}`);
           console.log(`New guild added : ${guild.name}, owned by ${guild.owner.user.username}`);
         }catch(err){
