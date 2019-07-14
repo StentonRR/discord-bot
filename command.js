@@ -284,7 +284,9 @@ module.exports = {
                   console.log(err);
                   return test.error(err);
                 }
-                let index = Math.round(Math.random() * files.length);    
+                let index = Math.floor(Math.random() * files.length);
+                if(index == files.length) index - 1;
+                
                 Yuko.bot.guilds.get(row.guild).channels.get(info[row.guild].bdaychannel).send(`:confetti_ball: :confetti_ball:@here LETS ALL WISH ${Yuko.bot.guilds.get(row.guild).members.get(row.id).toString()} A HAPPY BIRTHDAY!!!!:confetti_ball: :confetti_ball: `, {
                                          files: [`./pics/birthday/${files[index]}`]
                                        });
@@ -463,7 +465,9 @@ module.exports = {
             return test.error(err);
           }
 
-          let index = Math.round(Math.random() * files.length);
+          let index = Math.floor(Math.random() * files.length);
+          if(index == files.length) index - 1;
+
           message.channel.send(`WE WILL TAKE BACK THE HOLY LAND!!!!!`, {
                                files: [`./pics/deusvult/${files[index]}`]
                               })
