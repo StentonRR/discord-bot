@@ -17,14 +17,14 @@ const pool = new Pool({
 
 module.exports = {
 
-  test: async function(){
+  test: async () => {
     let client = await pool.connect();
     let res = await client.query('SELECT NOW()');
     client.release();
     console.log(res);
   },
 
-  add: async function(table, information){
+  add: async (table, information) => {
     try{
       let query = `SELECT * FROM information_schema.columns WHERE TABLE_NAME = '${table}';`;
 
@@ -46,7 +46,7 @@ module.exports = {
     }
   },
 
-  retrieve: async function(table, pk, key){
+  retrieve: async (table, pk, key) => {
     try{
       let query = `SELECT * FROM ${table} WHERE ${pk} = '${key}';`;
       let client = await pool.connect();
@@ -60,7 +60,7 @@ module.exports = {
         }
   },
 
-  custom: async function(query){
+  custom: async query => {
     try{
       let client = await pool.connect();
       let res = await client.query(query);

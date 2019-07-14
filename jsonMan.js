@@ -4,7 +4,7 @@ const test = require('./testingMethods.js');
 module.exports = {
 
   //Reads json file and returns data in object
-  read: function(file){
+  read: file => {
   	try{
   		let data = fs.readFileSync(file,'utf8');
   					return JSON.parse(data);
@@ -14,7 +14,7 @@ module.exports = {
   },
 
   //Writes object to json file
-   write: function(file, obj){
+   write: (file, obj) => {
      if(obj == undefined){return test.errorLog(`Unable to write ${obj} to ${file}`);}
   	try{
   		json = JSON.stringify(obj);
@@ -24,7 +24,7 @@ module.exports = {
   	}
   },
 
-  stringConverter: function(arr){
+  stringConverter: arr => {
     let str = "";
 
     for(let i = 0; i < arr.length; i++){
@@ -37,7 +37,7 @@ module.exports = {
     return str;
   },
 
-  attributeConverter: function(arr){
+  attributeConverter: arr => {
     let str = "";
 
     for(let i = 0; i < arr.length; i++){
@@ -51,7 +51,7 @@ module.exports = {
     return str;
   },
 
-  valueConverter: function(arr){
+  valueConverter: arr => {
     let str = "";
 
     for(let i = 0; i < arr.length; i++){
@@ -73,7 +73,7 @@ module.exports = {
     return str;
   },
 
-  filter: (str) =>{
+  filter: str =>{
     return str.replace(`'`, `/'`);
   }
 }

@@ -2,7 +2,7 @@ const jimp = require("jimp");
 const fs = require('fs');
 
 module.exports = {
-  createWelcomeImage: function(user, guild, channel) {
+  createWelcomeImage: (user, guild, channel) => {
 
       jimp.read('./pics/welcomerBackground.png').then(function(background){
         jimp.read(user.avatarURL).then(function(profPic){
