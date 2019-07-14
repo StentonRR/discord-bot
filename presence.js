@@ -64,7 +64,7 @@ module.exports = {
   },
 
 
-  streamPresence: async function(newMember, oldMember){
+  streamPresence: async (newMember, oldMember) => {
     let result =  [false, ''];
     let status = await module.exports.streamStatus(newMember);
 
@@ -93,7 +93,7 @@ module.exports = {
   },
 
 
-  streamPresenceTest: async function(newMember, oldMember){
+  streamPresenceTest: async (newMember, oldMember) => {
     let result =  [false, ''];
     let status = true;
 
@@ -109,7 +109,7 @@ module.exports = {
     },
 
 
-  gamePresence: function(member, oldMember){
+  gamePresence: (member, oldMember) => {
 
   }
 

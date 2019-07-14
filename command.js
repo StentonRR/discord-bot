@@ -279,9 +279,17 @@ module.exports = {
           for(let row of bdayData.rows){
 
             if(info[row.guild].bdaybool){
-              Yuko.bot.guilds.get(row.guild).channels.find(x => x.name === info[row.guild].bdaychannel).send(`:confetti_ball: :confetti_ball:@here LETS ALL WISH ${Yuko.bot.guilds.get(row.guild).members.get(row.id).toString()} A HAPPY BIRTHDAY!!!!:confetti_ball: :confetti_ball: `, {
-                                       files: ["./pics/birthday.png"]
-                                     });
+              fs.readdir('./pics/birthday', (err, files)=> {
+                if(err){
+                  console.log(err);
+                  return test.error(err);
+                }
+                let index = Math.round(Math.random() * files.length);    
+                Yuko.bot.guilds.get(row.guild).channels.get(info[row.guild].bdaychannel).send(`:confetti_ball: :confetti_ball:@here LETS ALL WISH ${Yuko.bot.guilds.get(row.guild).members.get(row.id).toString()} A HAPPY BIRTHDAY!!!!:confetti_ball: :confetti_ball: `, {
+                                         files: [`./pics/birthday/${files[index]}`]
+                                       });
+
+              })
             }
           }
         }catch(e){
@@ -419,8 +427,20 @@ module.exports = {
       },
       function: async (message, args, guild, id) => {
 
-        let c = await dataProvider.custom({name: 'create-role', text: `INSERT INTO role_T VALUES ($1, $2, $3)`, values: [`365236513627176962`, `Rainbow Six Siege`, `440981241932677121`] });
+        fs.readdir('./pics/deusvult', (err, files)=> {
+          if(err){
+            console.log(err);
+            return test.error(err);
+          }
+          test.log(files);
+          test.log(files.length);
+          let index = Math.round(Math.random() * files.length);
 
+          message.channel.send(`WE WILL TAKE BACK THE HOLY LAND!!!!!`, {
+                               files: [`./pics/deusvult/${files[index]}`]
+                              })
+
+        })
 
 
 
@@ -437,27 +457,18 @@ module.exports = {
         return true;
       },
       function: (message, args, guild, id) => {
+        fs.readdir('./pics/deusvult', (err, files)=> {
+          if(err){
+            console.log(err);
+            return test.error(err);
+          }
 
-        let choice = Math.round(Math.random() * 10);
-        let fileName;
+          let index = Math.round(Math.random() * files.length);
+          message.channel.send(`WE WILL TAKE BACK THE HOLY LAND!!!!!`, {
+                               files: [`./pics/deusvult/${files[index]}`]
+                              })
 
-        switch (choice) {
-          case 0: fileName = "./pics/deusvultaxe.gif"; break;
-          case 1: fileName = "./pics/deusvultboat.gif"; break;
-          case 2: fileName = "./pics/deusvultboobs.gif"; break;
-          case 3: fileName = "./pics/deusvultdance.gif"; break;
-          case 4: fileName = "./pics/deusvultpaint.gif"; break;
-          case 5: fileName = "./pics/deusvultparty.gif"; break;
-          case 6: fileName = "./pics/deusvultspin.gif"; break;
-          case 7: fileName = "./pics/deusvultthink.gif"; break;
-          case 8: fileName = "./pics/deusvultthump.gif"; break;
-          case 9: fileName = "./pics/deusvultintensifies.gif"; break;
-          default: fileName = "./pics/deusvultsun.gif";
-        }
-
-        message.channel.send(`WE WILL TAKE BACK THE HOLY LAND!!!!!`, {
-                             files: [fileName]
-                            })
+        })
       }
   },
 
