@@ -9,7 +9,7 @@ const util = require('util');
 
 module.exports = {
 
-        evaluateRole: async function(oldMember, newMember){
+        evaluateRole: async (oldMember, newMember) => {
 
           let guild = newMember.guild;
           let streamRole = guild.roles.find(x => x.name === "Streaming");

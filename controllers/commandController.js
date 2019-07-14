@@ -11,7 +11,7 @@ const commands = require('../command.js');
 
 module.exports = {
 
- command: function(message){
+ command: message => {
 
    try{
 			let command = message.content.split(" ")[0];
@@ -35,7 +35,7 @@ module.exports = {
 	},
 
   //Checks if server has welcomer enabled and sends message if true
-  welcome: async (member, guild) =>{
+  welcome: async (member, guild) => {
     try{
       let data = await dataProvider.custom(`SELECT welcomerbool, welcomerchannel FROM servers WHERE id = '${guild.id}'`);
 
@@ -53,7 +53,7 @@ module.exports = {
   },
 
   //checks if there is a birthday on the current day
-  checkbdayservice: async() =>{
+  checkbdayservice: async() => {
     try{
       let date = new Date();
       date.setFullYear(2000);
@@ -81,7 +81,6 @@ module.exports = {
     }catch(e){
       test.errorLog(e);
     }
-
 
   }
 };

@@ -114,17 +114,17 @@ module.exports = {
   },
 
   setBdays: {
-        description: "Enables birthday notification",
-        usage: "y/setBdays <text channel name>",
-        authorization: (id, guild, lvl='moderator') => {
-          return authorization.authorize(id, guild, lvl);
-        },
-        requirement: (args, msg) => {
-          return msg.guild.channels.find(x => x.name === args[0]) ? true : false;
-        },
-        function: (message, args, guild, id) => {
-          toggleOption.toggleOption("bday", true, message, guild.channels.find(x => x.name === args[0]).id);
-        }
+      description: "Enables birthday notification",
+      usage: "y/setBdays <text channel name>",
+      authorization: (id, guild, lvl='moderator') => {
+        return authorization.authorize(id, guild, lvl);
+      },
+      requirement: (args, msg) => {
+        return msg.guild.channels.find(x => x.name === args[0]) ? true : false;
+      },
+      function: (message, args, guild, id) => {
+        toggleOption.toggleOption("bday", true, message, guild.channels.find(x => x.name === args[0]).id);
+      }
   },
 
   bdaysOff: {
@@ -313,15 +313,14 @@ module.exports = {
       requirement: (args) => {
         return true;
       },
-      function: (message, args, guild, id) => {
+      function: async (message, args, guild, id) => {
+        let serverIds = await dataProvider.custom(`SELECT id FROM servers`);
 
-        dataProvider.custom(`SELECT id FROM servers`).then((serverIds) =>{
-          let servers = '\n'
-          for(let index of Object.keys(serverIds.rows)){
-            servers += `${Yuko.bot.guilds.get(serverIds.rows[index].id).name}\n`;
-          }
-          message.reply(servers);
-        });
+        let servers = '\n'
+        for(let index of Object.keys(serverIds.rows)){
+          servers += `${Yuko.bot.guilds.get(serverIds.rows[index].id).name}\n`;
+        }
+        message.reply(servers);
       }
   },
 
@@ -372,8 +371,8 @@ module.exports = {
       requirement: (args) => {
         return true;
       },
-      function: (message, args, guild, id) => {
-        dataProvider.test();
+      function: async (message, args, guild, id) => {
+        await dataProvider.test();
       }
   },
 
@@ -387,21 +386,24 @@ module.exports = {
       requirement: (args) => {
         return true;
       },
-      function: (message, args, guild, id) => {
+      function: async (message, args, guild, id) => {
         let ns = "not Set";
 
-        dataProvider.retrieve("servers", "id", guild.id).then(function(result){
-          let settingList = `\n**Stream Notification**: ${result.rows[0].streamlinkbool}, ${result.rows[0].streamlinkbool ? guild.channels.get(result.rows[0].streamlinkchannel).name : ns}
-                             **Stream Role Manipulation**: ${result.rows[0].streamrolebool}
-                             **Welcomer**: ${result.rows[0].welcomerbool}, ${result.rows[0].welcomerbool ? guild.channels.get(result.rows[0].welcomerchannel).name : ns}
-                             **Birthdays**: ${result.rows[0].bdaybool}, ${result.rows[0].bdaybool ? guild.channels.get(result.rows[0].bdaychannel).name : ns}`;
-          let embed = new Discord.RichEmbed()
-              .setColor(Yuko.settings.msgColor)
-              .setAuthor('Settings', Yuko.bot.user.avatarURL)
-              .setDescription(settingList);
+        let result = await dataProvider.retrieve("servers", "id", guild.id);
+        let settingList = `\n**Stream Notification**: ${result.rows[0].streamlinkbool}, ${result.rows[0].streamlinkbool ? guild.channels.get(result.rows[0].streamlinkchannel).name : ns}
+                           **Stream Role Manipulation**: ${result.rows[0].streamrolebool}
+                           **Welcomer**: ${result.rows[0].welcomerbool}, ${result.rows[0].welcomerbool ? guild.channels.get(result.rows[0].welcomerchannel).name : ns}
+                           **Birthdays**: ${result.rows[0].bdaybool}, ${result.rows[0].bdaybool ? guild.channels.get(result.rows[0].bdaychannel).name : ns}`;
+        let embed = new Discord.RichEmbed()
+            .setColor(Yuko.settings.msgColor)
+            .setAuthor('Settings', Yuko.bot.user.avatarURL)
+            .setDescription(settingList);
 
-          message.reply({embed});
-        });
+        message.reply({embed});
+
+
+
+
       }
   },
 
@@ -648,9 +650,9 @@ module.exports = {
       requirement: (args) => {
         return true;
       },
-      function: (message, args, guild, id) => {
+      function: async (message, args, guild, id) => {
         try{
-          dataProvider.custom(`INSERT INTO servers (id, name) VALUES ('${Yuko.bot.guilds.get(args[0]).id}', '${Yuko.bot.guilds.get(args[0]).name}')`);
+          await dataProvider.custom(`INSERT INTO servers (id, name) VALUES ('${Yuko.bot.guilds.get(args[0]).id}', '${Yuko.bot.guilds.get(args[0]).name}')`);
           test.log(`New guild added : ${guild.name}, owned by ${guild.owner.user.username}`);
           console.log(`New guild added : ${guild.name}, owned by ${guild.owner.user.username}`);
         }catch(err){
