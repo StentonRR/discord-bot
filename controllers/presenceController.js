@@ -13,7 +13,7 @@ module.exports = {
 
           let guild = newMember.guild;
           let streamRole = guild.roles.find(x => x.name === "Streaming");
-          
+
           if(!guild.members.get(Yuko.settings.myId).hasPermission("MANAGE_ROLES")) return;
           if(guild.members.get(Yuko.settings.myId).highestRole.position < newMember.highestRole.position) return;
 
@@ -36,8 +36,19 @@ module.exports = {
                   if(!streamRole){ guild.createRole({name: "Streaming"}); streamRole = guild.roles.find(x => x.name === "Streaming"); }
 
                   // Give or take role?
-                  if(streamPres[1] === 'Start Stream') newMember.addRole(streamRole);//test.log(`${newMember.user.username} gets stream role in ${guild.name}`)
-                  if(streamPres[1] === 'Stop Stream') newMember.removeRole(streamRole);//test.log(`${newMember.user.username} needs role removed in ${guild.name}`)
+                  if(streamPres[1] === 'Start Stream' && !newMember.presence.game.url){
+                    test.errorLog(`Stream role exception!
+                                   Error:
+                                   ${e}`);
+                    console.log(e);
+                    test.errorLog(`Old Member:
+                                   ${util.inspect(oldMember)}`);
+
+                    test.errorLog(`New Member:
+                                   ${util.inspect(newMember)}`);
+                  }
+                  if(streamPres[1] === 'Start Stream') newMember.addRole(streamRole);
+                  if(streamPres[1] === 'Stop Stream') newMember.removeRole(streamRole);
                 }
 
                 // Check if streaming notifications are enabled

@@ -15,8 +15,8 @@ const schedule = require('node-schedule');
 
 exports.settings;
 
-
-exports.bot.login(auth.token);
+let token = auth.test ? auth.testToken : auth.token;
+exports.bot.login(token);
 
 
 //process.on('unhandledRejection', console.error);
@@ -90,7 +90,7 @@ exports.bot.on('message', (message) => {
 
 exports.bot.on('messageDelete', (message) => {
 	if(message.guild.id == exports.settings.testServer) return;
-	exports.bot.guilds.get("341746752409567242").channels.get("531331487442665511").send(`User: ${message.author.username} (${message.author.id})\nGuild: ${message.guild.name}\nChannel: ${message.channel.name}\nContent:\n${message.content}`);
+	exports.bot.guilds.get(exports.settings.testServer).channels.get(exports.settings.dumpSettings).send(`User: ${message.author.username} (${message.author.id})\nGuild: ${message.guild.name}\nChannel: ${message.channel.name}\nContent:\n${message.content}`);
 }); //END MESSAGE DELETE HANDLER
 
 
