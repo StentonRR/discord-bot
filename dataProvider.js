@@ -69,8 +69,19 @@ module.exports = {
 
       return res;
     }catch(e){
+      console.log(e);
       test.errorLog(e);
       test.errorLog(query);
     }
+  },
+
+  addGuild: async (guildId, guildName) => {
+    let res = await module.exports.custom(`INSERT INTO servers (id, name) VALUES ('${guildId}', '${guildName}')`);
+    return res;
+  },
+
+  verifyGuild: async guildId => {
+    let res = await module.exports.custom(`SELECT * FROM servers WHERE id = '${guildId}'`);
+    return res.rows.length;
   }
 }

@@ -14,8 +14,14 @@ module.exports = {
           let guild = newMember.guild;
           let streamRole = guild.roles.find(x => x.name === "Streaming");
 
-          if(!guild.members.get(Yuko.settings.myId).hasPermission("MANAGE_ROLES")) return;
-          if(guild.members.get(Yuko.settings.myId).highestRole.position < newMember.highestRole.position) return;
+          try {
+            if(!guild.members.get(Yuko.settings.my_id).hasPermission("MANAGE_ROLES")) return;
+          } catch(err) {
+            console.log(err);
+            test.errorLog(err);
+          }
+
+          if(guild.members.get(Yuko.settings.my_id).highestRole.position < newMember.highestRole.position) return;
 
 
           if(newMember.user.bot) return;
@@ -77,7 +83,7 @@ module.exports = {
 
           // Game role controller
           try{
-            let serverRoles = await dataProvider.custom(`SELECT * FROM role_t WHERE id = '${newMember.guild.id}'`)
+            let serverRoles = await dataProvider.custom(`SELECT * FROM role_t WHERE id = '${newMember.guild.id}'`);
 
             if(serverRoles.rowCount){
                if(newMember.presence.game){

@@ -2,7 +2,7 @@ const Yuko = require("./Yuko.js");
 
 var levels = {
   yuko: (userId, guild) => {
-    return userId == Yuko.settings.myId;
+    return userId == Yuko.settings.my_id;
   },
   rune: (userId, guild) => {
     return userId == Yuko.settings.rune;

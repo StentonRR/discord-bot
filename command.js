@@ -215,7 +215,7 @@ module.exports = {
         }
 
         let embed = new Discord.RichEmbed()
-            .setColor(Yuko.settings.msgColor)
+            .setColor(Yuko.settings.msg_color)
             .setAuthor('Commands', Yuko.bot.user.avatarURL)
             .setDescription(commandList);
 
@@ -286,7 +286,7 @@ module.exports = {
                 }
                 let index = Math.floor(Math.random() * files.length);
                 if(index == files.length) index - 1;
-                
+
                 Yuko.bot.guilds.get(row.guild).channels.get(info[row.guild].bdaychannel).send(`:confetti_ball: :confetti_ball:@here LETS ALL WISH ${Yuko.bot.guilds.get(row.guild).members.get(row.id).toString()} A HAPPY BIRTHDAY!!!!:confetti_ball: :confetti_ball: `, {
                                          files: [`./pics/birthday/${files[index]}`]
                                        });
@@ -405,7 +405,7 @@ module.exports = {
                            **Welcomer**: ${result.rows[0].welcomerbool}, ${result.rows[0].welcomerbool ? guild.channels.get(result.rows[0].welcomerchannel).name : ns}
                            **Birthdays**: ${result.rows[0].bdaybool}, ${result.rows[0].bdaybool ? guild.channels.get(result.rows[0].bdaychannel).name : ns}`;
         let embed = new Discord.RichEmbed()
-            .setColor(Yuko.settings.msgColor)
+            .setColor(Yuko.settings.msg_color)
             .setAuthor('Settings', Yuko.bot.user.avatarURL)
             .setDescription(settingList);
 

@@ -12,7 +12,7 @@ module.exports = {
       let username = urlPieces[urlPieces.length - 1];
 
       let response = await fetch(`https://api.twitch.tv/helix/streams?user_login=${username}`
-                                  , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitchId}} );
+                                  , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitch_id}} );
 
       let streamInfo = await response.json();
 
@@ -27,7 +27,7 @@ module.exports = {
 
     getGame: async (gameId) => {
       let response = await fetch(`https://api.twitch.tv/helix/games?id=${gameId}`
-                                , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitchId}} );
+                                , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitch_id}} );
 
       let gameInfo = await response.json();
 
@@ -40,7 +40,7 @@ module.exports = {
       let username = urlPieces[urlPieces.length - 1];
 
       let response = await fetch(`https://api.twitch.tv/helix/users?login=${username}`
-                                  , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitchId}} );
+                                  , {method: 'GET', headers: {"Client-ID": Yuko.settings.twitch_id}} );
 
       let userInfo = await response.json();
 
