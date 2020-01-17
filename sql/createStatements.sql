@@ -19,13 +19,17 @@ CREATE TABLE servers(
   welcomerbool BOOLEAN DEFAULT False,
   welcomerchannel VARCHAR(20),
   bdaybool BOOLEAN DEFAULT False,
-  bdaychannel VARCHAR(20)
+  bdaychannel VARCHAR(20),
+  date_created DATE NOT NULL,
+  date_updated DATE NOT NULL
 );
 
 CREATE TABLE bday(
   id VARCHAR(20) NOT NULL,
   bdaydate DATE NOT NULL,
   guild VARCHAR(20) NOT NULL,
+  date_created DATE NOT NULL,
+  date_updated DATE NOT NULL,
   PRIMARY KEY (id, guild)
 );
 
@@ -33,6 +37,8 @@ CREATE TABLE stream_t(
   id VARCHAR(20) NOT NULL,
   guild VARCHAR(20) NOT NULL,
   status BOOLEAN DEFAULT False,
+  date_created DATE NOT NULL,
+  date_updated DATE NOT NULL,
   PRIMARY KEY (id, guild)
 );
 
@@ -40,5 +46,7 @@ CREATE TABLE role_t(
   id VARCHAR(20) NOT NULL,
   regex TEXT,
   roleid VARCHAR(20) NOT NULL,
+  date_created DATE NOT NULL,
+  date_updated DATE NOT NULL,
   PRIMARY KEY (id, roleid)
 );
