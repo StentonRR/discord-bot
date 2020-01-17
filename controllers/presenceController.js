@@ -13,13 +13,8 @@ module.exports = {
 
           let guild = newMember.guild;
           let streamRole = guild.roles.find(x => x.name === "Streaming");
+          if(!guild.members.get(Yuko.settings.my_id).hasPermission("MANAGE_ROLES")) return;
 
-          try {
-            if(!guild.members.get(Yuko.settings.my_id).hasPermission("MANAGE_ROLES")) return;
-          } catch(err) {
-            console.log(err);
-            test.errorLog(err);
-          }
 
           if(guild.members.get(Yuko.settings.my_id).highestRole.position < newMember.highestRole.position) return;
 

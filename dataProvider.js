@@ -24,6 +24,21 @@ module.exports = {
     console.log(res);
   },
 
+  query: async (sql, parameters) => {
+
+    try{
+        let client = await pool.connect();
+        let res = await client.query(sql, parameters);
+
+        client.release();
+
+        return res;
+
+    }catch(e){
+        console.log(e);
+    }
+},
+
   add: async (table, information) => {
     try{
       let query = `SELECT * FROM information_schema.columns WHERE TABLE_NAME = '${table}';`;
@@ -83,5 +98,11 @@ module.exports = {
   verifyGuild: async guildId => {
     let res = await module.exports.custom(`SELECT * FROM servers WHERE id = '${guildId}'`);
     return res.rows.length;
+  },
+
+  toggleRoleManipulation: async (guildId, toggle) => {
+    let res = await module.exports.custom(`UPDATE servers SET streamrolebool = ${toggle} WHERE id = '${guildId}'`);
+    return res;
   }
+
 }

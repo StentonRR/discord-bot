@@ -170,6 +170,36 @@ module.exports = {
       }
   },
 
+  setRoleManipulation: {
+      description: "Enable role manipulation",
+      usage: "y/setRoleManipulation",
+      authorization: (id, guild, lvl='moderator') => {
+        return authorization.authorize(id, guild, lvl);
+      },
+      requirement: (args, msg) => {
+        return true;
+      },
+      function: (message, args, guild, id) => {
+        dataProvider.toggleRoleManipulation(message.guild.id, true);
+        message.reply(`Role manipulation has been toggled to true`);
+      }
+  },
+
+  roleManipulationOff: {
+      description: "Disable role manipulation",
+      usage: "y/roleManipulationOff",
+      authorization: (id, guild, lvl='moderator') => {
+        return authorization.authorize(id, guild, lvl);
+      },
+      requirement: (args, msg) => {
+        return true;
+      },
+      function: (message, args, guild, id) => {
+        dataProvider.toggleRoleManipulation(message.guild.id, false);
+        message.reply(`Role manipulation has been toggled to false`);
+      }
+  },
+
   setWelcomer: {
       description: "Enable welcome notifications",
       usage: "y/setWelcomer <text channel name>",
@@ -177,7 +207,7 @@ module.exports = {
         return authorization.authorize(id, guild, lvl);
       },
       requirement: (args, msg) => {
-        return msg.guild.channels.find(x => x.name === args[0]) ? true : false;;
+        return msg.guild.channels.find(x => x.name === args[0]) ? true : false;
       },
       function: (message, args, guild, id) => {
         toggleOption.toggleOption("welcomer", true, message, guild.channels.find(x => x.name === args[0]).id);
@@ -507,8 +537,8 @@ module.exports = {
   },
 
   stream: {
-      description: "Find those who are streaming",
-      usage: "y/stream <person>",
+      description: "Give stream role",
+      usage: "y/stream <guild id> <member id>",
       authorization: (id, guild, lvl='rune') => {
         return authorization.authorize(id, guild, lvl);
       },

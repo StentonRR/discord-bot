@@ -14,6 +14,7 @@ CREATE TABLE servers(
   id VARCHAR(20) PRIMARY KEY,
   name TEXT NOT NULL,
   streamlinkbool BOOLEAN DEFAULT False,
+  streamlinkchannel VARCHAR(20),
   streamrolebool BOOLEAN DEFAULT False,
   welcomerbool BOOLEAN DEFAULT False,
   welcomerchannel VARCHAR(20),
